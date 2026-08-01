@@ -10,7 +10,24 @@ permissions:
 
 jobs:
   collect:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            os: "24.04"
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            os: "24.04"
+            arch: arm64
+          - runner: ubuntu-26.04
+            os: "26.04"
+            arch: amd64
+          - runner: ubuntu-26.04-arm
+            os: "26.04"
+            arch: arm64
+    name: collect ${{ matrix.os }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,13 +38,20 @@ jobs:
       - name: Collect system tuning flags
         run: |
           mkdir -p out
-          ./scripts/collect-sysctl.sh 2>&1 | tee out/sysctl-report.txt
+          {
+            echo "matrix.runner=${{ matrix.runner }}"
+            echo "matrix.os=${{ matrix.os }}"
+            echo "matrix.arch=${{ matrix.arch }}"
+            echo "uname=$(uname -a)"
+            echo
+            ./scripts/collect-sysctl.sh
+          } 2>&1 | tee out/sysctl-report.txt
 
       - name: Upload report artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: sysctl-report
+          name: sysctl-report-ubuntu${{ matrix.os }}-${{ matrix.arch }}
           path: out/sysctl-report.txt
           if-no-files-found: warn
           retention-days: 7
