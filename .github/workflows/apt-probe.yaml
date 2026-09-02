@@ -16,7 +16,7 @@ jobs:
           cfg=$(find /etc/apt/sources.list /etc/apt/sources.list.d /etc/os-release -maxdepth 1 -type f -printf '%T@\n' 2>/dev/null | sort -n | tail -1 | cut -d. -f1 || true)
           echo "index files: $(find /var/lib/apt/lists -maxdepth 1 -type f ! -name lock | wc -l) (newest idx mtime=$idx, newest cfg mtime=$cfg)"
           echo "--- apt-get install git-crypt (no apt-get update) ---"
-          apt-get install git-crypt
+          sudo apt-get install git-crypt
           git-crypt --version
   apt-install-no-update:
     name: apt install (no update)
@@ -30,5 +30,5 @@ jobs:
           cfg=$(find /etc/apt/sources.list /etc/apt/sources.list.d /etc/os-release -maxdepth 1 -type f -printf '%T@\n' 2>/dev/null | sort -n | tail -1 | cut -d. -f1 || true)
           echo "index files: $(find /var/lib/apt/lists -maxdepth 1 -type f ! -name lock | wc -l) (newest idx mtime=$idx, newest cfg mtime=$cfg)"
           echo "--- apt install git-crypt (no apt-get update) ---"
-          apt install git-crypt
+          sudo apt install git-crypt
           git-crypt --version
