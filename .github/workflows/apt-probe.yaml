@@ -1,0 +1,34 @@
+---
+name: apt-probe
+on:
+  push:
+    branches: [apt-probe]
+jobs:
+  apt-get-no-update:
+    name: apt-get install (no update)
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Install git-crypt via apt-get without apt-get update
+        run: |
+          set -Eeuxo pipefail
+          echo "runner: $(. /etc/os-release && echo "$PRETTY_NAME")"
+          idx=$(find /var/lib/apt/lists -maxdepth 1 -type f ! -name lock -printf '%T@\n' 2>/dev/null | sort -n | tail -1 | cut -d. -f1 || true)
+          cfg=$(find /etc/apt/sources.list /etc/apt/sources.list.d /etc/os-release -maxdepth 1 -type f -printf '%T@\n' 2>/dev/null | sort -n | tail -1 | cut -d. -f1 || true)
+          echo "index files: $(find /var/lib/apt/lists -maxdepth 1 -type f ! -name lock | wc -l) (newest idx mtime=$idx, newest cfg mtime=$cfg)"
+          echo "--- apt-get install git-crypt (no apt-get update) ---"
+          apt-get install git-crypt
+          git-crypt --version
+  apt-install-no-update:
+    name: apt install (no update)
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Install git-crypt via apt without apt-get update
+        run: |
+          set -Eeuxo pipefail
+          echo "runner: $(. /etc/os-release && echo "$PRETTY_NAME")"
+          idx=$(find /var/lib/apt/lists -maxdepth 1 -type f ! -name lock -printf '%T@\n' 2>/dev/null | sort -n | tail -1 | cut -d. -f1 || true)
+          cfg=$(find /etc/apt/sources.list /etc/apt/sources.list.d /etc/os-release -maxdepth 1 -type f -printf '%T@\n' 2>/dev/null | sort -n | tail -1 | cut -d. -f1 || true)
+          echo "index files: $(find /var/lib/apt/lists -maxdepth 1 -type f ! -name lock | wc -l) (newest idx mtime=$idx, newest cfg mtime=$cfg)"
+          echo "--- apt install git-crypt (no apt-get update) ---"
+          apt install git-crypt
+          git-crypt --version
